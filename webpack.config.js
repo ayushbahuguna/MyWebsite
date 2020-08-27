@@ -1,34 +1,35 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const path = require('path');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const path = require("path");
 
 module.exports = {
   output: {
-    path: path.resolve(__dirname, 'docs'),
+    path: path.resolve(__dirname, "docs"),
   },
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.pug$/,
-        use: ["pug-loader"]
+        use: ["pug-loader"],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
         use: [
-          "file-loader",
           {
-            loader: "url-loader",
+            loader: "file-loader",
             options: {
-              name: "img/[name].[ext]"
-            }
-          }
-        ]
+              name: "images/[path][name].[hash].[ext]",
+            },
+          },
+        ],
       },
       {
         test: /\.scss$/,
@@ -37,20 +38,23 @@ module.exports = {
           MiniCssExtractPlugin.loader,
           "css-loader",
           "postcss-loader",
-          "sass-loader"
-        ]
-      }
-    ]
+          "sass-loader",
+        ],
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/index.pug",
-      filename: "./index.html"
+      filename: "./index.html",
     }),
 
     new MiniCssExtractPlugin({
       filename: "[name].css",
-      chunkFilename: "[id].css"
-    })
-  ]
+      chunkFilename: "[id].css",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: "src/images", to: "images" }],
+    }),
+  ],
 };
